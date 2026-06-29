@@ -12,6 +12,7 @@ import { swaggerSpec } from "./config/swagger";
 import routes from "./routes/index";
 
 const app = express();
+const PORT = Number(process.env.PORT ?? 5000);
 
 app.use(cors(corsOptions));
 app.use(helmet());
@@ -24,21 +25,37 @@ app.get("/", (_, res) => {
   res.status(200).json({ message: "Server working" });
 });
 app.use("/", routes);
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use((_, res) => {
   res.status(404).json({ success: false, message: "Route not found." });
 });
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use(
+  (
+    err: Error,
+    _req: express.Request,
+    res: express.Response,
+    _next: express.NextFunction
+  ) => {
+    console.error("Unhandled API error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
+);
 
 process.on("unhandledRejection", (err) => {
+  console.error("Unhandled rejection:", err);
   process.exit(1);
 });
 process.on("uncaughtException", (err) => {
+  console.error("Uncaught exception:", err);
   process.exit(1);
 });
 
 const start = async () => {
   await connectDB();
-  app.listen(5000, () => console.log("Server running on port 5000"));
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 };
 
 start().catch((err) => {

@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   register,
   login,
+  loginGuest,
   refresh,
   logout,
   me
@@ -12,6 +13,7 @@ const router = Router();
 
 router.post("/register", register);
 router.post("/login", login);
+router.post("/guest", loginGuest);
 router.post("/refresh", refresh);
 router.post("/logout", logout);
 router.get("/me", authenticate, me);

@@ -13,6 +13,9 @@ export const rateLimit = (req: Request, res: Response, next: NextFunction) => {
       next();
     })
     .catch(() => {
-      res.status(429).send("Too Many Requests");
+      res.status(429).json({
+        success: false,
+        message: "Too Many Requests"
+      });
     });
 };

@@ -11,8 +11,18 @@ import { authorizeRoles } from "../middlewares/authorize";
 
 const router = Router();
 
-router.get("/", getContests);
-router.get("/:id", getContest);
+router.get(
+  "/",
+  authenticate,
+  authorizeRoles("ADMIN", "VIP", "USER", "GUEST"),
+  getContests
+);
+router.get(
+  "/:id",
+  authenticate,
+  authorizeRoles("ADMIN", "VIP", "USER", "GUEST"),
+  getContest
+);
 router.post("/", authenticate, authorizeRoles("ADMIN"), createContest);
 router.put("/:id", authenticate, authorizeRoles("ADMIN"), updateContest);
 router.delete("/:id", authenticate, authorizeRoles("ADMIN"), deleteContest);

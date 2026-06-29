@@ -21,6 +21,11 @@ router.post(
   authorizeRoles("ADMIN", "VIP", "USER"),
   submitContest
 );
-router.get("/:id/leaderboard", getLeaderboard);
+router.get(
+  "/:id/leaderboard",
+  authenticate,
+  authorizeRoles("ADMIN", "VIP", "USER", "GUEST"),
+  getLeaderboard
+);
 
 export default router;
