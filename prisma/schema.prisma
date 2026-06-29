@@ -1,0 +1,177 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  VIP
+  USER
+  GUEST
+}
+
+enum ContestAccess {
+  NORMAL
+  VIP
+}
+
+enum ContestStatus {
+  DRAFT
+  ACTIVE
+  ENDED
+  CANCELLED
+}
+
+enum QuestionType {
+  SINGLE_SELECT
+  MULTI_SELECT
+  TRUE_FALSE
+}
+
+enum ParticipationStatus {
+  IN_PROGRESS
+  SUBMITTED
+}
+
+// ─── Models ──────────────────────────────────────────────────────────────────
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  username      String   @unique
+  passwordHash  String
+  role          Role     @default(USER)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  participations Participation[]
+  prizes         PrizeAwarded[]
+  leaderboard    LeaderboardEntry[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model Contest {
+  id          String        @id @default(uuid())
+  title       String
+  description String
+  access      ContestAccess @default(NORMAL)
+  status      ContestStatus @default(DRAFT)
+  startsAt    DateTime
+  endsAt      DateTime
+  prizeTitle  String
+  prizeDesc   String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  questions      Question[]
+  participations Participation[]
+  leaderboard    LeaderboardEntry[]
+  prizes         PrizeAwarded[]
+
+  @@index([status])
+  @@index([access])
+  @@index([startsAt, endsAt])
+}
+
+model Question {
+  id         String       @id @default(uuid())
+  contestId  String
+  text       String
+  type       QuestionType
+  order      Int
+  points     Int          @default(1)
+  createdAt  DateTime     @default(now())
+
+  contest  Contest  @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  options  Option[]
+  answers  Answer[]
+
+  @@unique([contestId, order])
+  @@index([contestId])
+}
+
+model Option {
+  id         String  @id @default(uuid())
+  questionId String
+  text       String
+  isCorrect  Boolean @default(false)
+  order      Int
+
+  question Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answers  Answer[]
+
+  @@unique([questionId, order])
+  @@index([questionId])
+}
+
+model Participation {
+  id        String              @id @default(uuid())
+  userId    String
+  contestId String
+  status    ParticipationStatus @default(IN_PROGRESS)
+  score     Int                 @default(0)
+  startedAt DateTime            @default(now())
+  submittedAt DateTime?
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contest Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  answers Answer[]
+
+  @@unique([userId, contestId])
+  @@index([userId])
+  @@index([contestId])
+  @@index([status])
+}
+
+model Answer {
+  id              String   @id @default(uuid())
+  participationId String
+  questionId      String
+  optionId        String
+  createdAt       DateTime @default(now())
+
+  participation Participation @relation(fields: [participationId], references: [id], onDelete: Cascade)
+  question      Question      @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  option        Option        @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  @@unique([participationId, questionId, optionId])
+  @@index([participationId])
+  @@index([questionId])
+}
+
+model LeaderboardEntry {
+  id        String   @id @default(uuid())
+  contestId String
+  userId    String
+  score     Int
+  rank      Int
+  updatedAt DateTime @updatedAt
+
+  contest Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([contestId, userId])
+  @@unique([contestId, rank])
+  @@index([contestId, score(sort: Desc)])
+}
+
+model PrizeAwarded {
+  id        String   @id @default(uuid())
+  contestId String
+  userId    String
+  title     String
+  desc      String?
+  awardedAt DateTime @default(now())
+
+  contest Contest @relation(fields: [contestId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+
+  @@unique([contestId, userId])
+  @@index([userId])
+}
