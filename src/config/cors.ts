@@ -1,7 +1,7 @@
 import { CorsOptions } from "cors";
 
 const allowedOrigins = new Set<string>(
-  (process.env.CORS_ALLOWED_ORIGINS ?? "")
+  (process.env.ALLOWED_ORIGINS ?? "")
     .split(",")
     .map((origin) => origin.trim())
     .filter(Boolean)

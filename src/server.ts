@@ -7,8 +7,6 @@ import cookieParser from "cookie-parser";
 import corsOptions from "./config/cors";
 import { rateLimit } from "./middlewares/rateLimit";
 import { connectDB } from "./config/prisma";
-import swaggerUi from "swagger-ui-express";
-import { swaggerSpec } from "./config/swagger";
 import routes from "./routes/index";
 
 const app = express();
@@ -25,7 +23,6 @@ app.get("/", (_, res) => {
   res.status(200).json({ message: "Server working" });
 });
 app.use("/", routes);
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use((_, res) => {
   res.status(404).json({ success: false, message: "Route not found." });
 });
