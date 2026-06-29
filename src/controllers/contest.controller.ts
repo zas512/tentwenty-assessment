@@ -88,6 +88,10 @@ export const getContest = async (req: Request, res: Response) => {
     res.status(404).json({ success: false, message: "Contest not found" });
     return;
   }
+  if (contest.status === ContestStatus.DRAFT && role !== Role.ADMIN) {
+    res.status(403).json({ success: false, message: "Forbidden" });
+    return;
+  }
   if (
     contest.access === ContestAccess.VIP &&
     role !== Role.ADMIN &&

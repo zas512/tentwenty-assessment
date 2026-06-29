@@ -10,7 +10,12 @@ import { authorizeRoles } from "../middlewares/authorize";
 
 const router = Router();
 
-router.get("/:id/questions", getQuestions);
+router.get(
+  "/:id/questions",
+  authenticate,
+  authorizeRoles("ADMIN", "VIP", "USER", "GUEST"),
+  getQuestions
+);
 router.post(
   "/:id/questions",
   authenticate,

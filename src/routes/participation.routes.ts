@@ -12,13 +12,13 @@ const router = Router();
 router.post(
   "/:id/join",
   authenticate,
-  authorizeRoles("ADMIN", "VIP", "USER"),
+  authorizeRoles("ADMIN", "VIP", "USER", "GUEST"),
   joinContest
 );
 router.post(
   "/:id/submit",
   authenticate,
-  authorizeRoles("ADMIN", "VIP", "USER"),
+  authorizeRoles("ADMIN", "VIP", "USER", "GUEST"),
   submitContest
 );
 router.get(

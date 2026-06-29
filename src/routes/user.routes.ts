@@ -21,19 +21,19 @@ router.patch(
 router.get(
   "/me/history",
   authenticate,
-  authorizeRoles("ADMIN", "VIP", "USER"),
+  authorizeRoles("ADMIN", "VIP", "USER", "GUEST"),
   getMyHistory
 );
 router.get(
   "/me/history/inprogress",
   authenticate,
-  authorizeRoles("ADMIN", "VIP", "USER"),
+  authorizeRoles("ADMIN", "VIP", "USER", "GUEST"),
   getInProgressContests
 );
 router.get(
   "/me/prizes",
   authenticate,
-  authorizeRoles("ADMIN", "VIP", "USER"),
+  authorizeRoles("ADMIN", "VIP", "USER", "GUEST"),
   getMyPrizes
 );
 

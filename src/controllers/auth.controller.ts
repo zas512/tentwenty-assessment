@@ -71,7 +71,6 @@ export const login = async (req: Request, res: Response) => {
   }
   const accessToken = signAccessToken({ id: user.id, role: user.role });
   const refreshToken = signRefreshToken({ id: user.id });
-
   res.cookie("accessToken", accessToken, cookieOptions(1));
   res.cookie("refreshToken", refreshToken, cookieOptions(7));
   res.json({
@@ -83,7 +82,6 @@ export const login = async (req: Request, res: Response) => {
 export const loginGuest = async (_req: Request, res: Response) => {
   const { email, username } = toGuestIdentity();
   const passwordHash = await bcrypt.hash(`${email}:${username}`, 10);
-
   const guest = await prisma.user.create({
     data: {
       email,
@@ -93,10 +91,8 @@ export const loginGuest = async (_req: Request, res: Response) => {
     },
     select: { id: true, email: true, username: true, role: true }
   });
-
   const accessToken = signAccessToken({ id: guest.id, role: guest.role });
   const refreshToken = signRefreshToken({ id: guest.id });
-
   res.cookie("accessToken", accessToken, cookieOptions(1));
   res.cookie("refreshToken", refreshToken, cookieOptions(7));
   res.status(201).json({ success: true, data: guest });
