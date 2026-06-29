@@ -1,13 +1,16 @@
-import "dotenv/config";
+import { config } from "dotenv";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import compression from "compression";
 import cookieParser from "cookie-parser";
 import corsOptions from "./config/cors";
+import { apiLogger } from "./middlewares/apiLogger";
 import { rateLimit } from "./middlewares/rateLimit";
 import { connectDB } from "./config/prisma";
 import routes from "./routes/index";
+
+config({ override: true });
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 5000);
@@ -17,6 +20,7 @@ app.use(helmet());
 app.use(compression());
 app.use(express.json());
 app.use(cookieParser(process.env.JWT_SECRET));
+app.use(apiLogger);
 app.use(rateLimit);
 
 app.get("/", (_, res) => {
