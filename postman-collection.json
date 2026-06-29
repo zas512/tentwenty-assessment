@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "8ff8ecce-1ee9-4858-a145-46d5f6e4f321",
     "name": "TenTwenty Test APIs",
-    "description": "Postman collection for authenticated Guest, User, VIP and Admin contest flows.",
+    "description": "Postman collection for authenticated Guest, User, VIP and Admin contest flows. Import with cookies enabled and use the seeded contest/question IDs or your own local data.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -11,6 +11,7 @@
       "item": [
         {
           "name": "Register User",
+          "description": "Register a normal user account.",
           "request": {
             "method": "POST",
             "header": [
@@ -37,6 +38,7 @@
         },
         {
           "name": "Login User",
+          "description": "Log in a registered user and store auth cookies in Postman.",
           "request": {
             "method": "POST",
             "header": [
@@ -63,6 +65,7 @@
         },
         {
           "name": "Guest Login",
+          "description": "Create an authenticated guest session. This is still a protected authenticated flow.",
           "request": {
             "method": "POST",
             "url": {
@@ -79,6 +82,7 @@
         },
         {
           "name": "Get My Profile",
+          "description": "Fetch the current authenticated user from the access cookie.",
           "request": {
             "method": "GET",
             "url": {
@@ -95,6 +99,7 @@
         },
         {
           "name": "Refresh Token",
+          "description": "Exchange the refresh cookie for a new access cookie.",
           "request": {
             "method": "POST",
             "url": {
@@ -111,6 +116,7 @@
         },
         {
           "name": "Logout",
+          "description": "Clear the auth cookies.",
           "request": {
             "method": "POST",
             "url": {
@@ -132,6 +138,7 @@
       "item": [
         {
           "name": "Get Contests (Authenticated)",
+          "description": "List contests visible to the authenticated role.",
           "request": {
             "method": "GET",
             "url": {
@@ -147,6 +154,7 @@
         },
         {
           "name": "Get Contest By Id (Authenticated)",
+          "description": "Fetch a single contest. Draft contests are admin-only and VIP contests are restricted to admin and VIP roles.",
           "request": {
             "method": "GET",
             "url": {
@@ -163,6 +171,7 @@
         },
         {
           "name": "Get Contest Questions",
+          "description": "Fetch contest questions for the authenticated role.",
           "request": {
             "method": "GET",
             "url": {
@@ -185,6 +194,7 @@
       "item": [
         {
           "name": "Join Contest",
+          "description": "Join a contest before submitting answers.",
           "request": {
             "method": "POST",
             "url": {
@@ -202,6 +212,7 @@
         },
         {
           "name": "Submit Contest Answers",
+          "description": "Submit answers and receive the calculated score.",
           "request": {
             "method": "POST",
             "header": [
@@ -229,10 +240,11 @@
         },
         {
           "name": "Get Leaderboard (Authenticated)",
+          "description": "Fetch leaderboard entries for a contest. Supports optional limit and offset query params.",
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{baseUrl}}/participation/{{contestId}}/leaderboard",
+              "raw": "{{baseUrl}}/participation/{{contestId}}/leaderboard?limit=50&offset=0",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -240,6 +252,16 @@
                 "participation",
                 "{{contestId}}",
                 "leaderboard"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
               ]
             }
           }
@@ -251,6 +273,7 @@
       "item": [
         {
           "name": "My History",
+          "description": "Return the current user's full participation history.",
           "request": {
             "method": "GET",
             "url": {
@@ -268,6 +291,7 @@
         },
         {
           "name": "My In Progress Contests",
+          "description": "Return participations that are still in progress.",
           "request": {
             "method": "GET",
             "url": {
@@ -286,6 +310,7 @@
         },
         {
           "name": "My Prizes",
+          "description": "Return prizes won by the current user.",
           "request": {
             "method": "GET",
             "url": {
@@ -297,6 +322,201 @@
                 "user",
                 "me",
                 "prizes"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Get All Users",
+          "description": "Admin only. List all users.",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/user",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update User Role",
+          "description": "Admin only. Update a user's role to ADMIN, VIP, USER, or GUEST.",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user/{{userId}}/role",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user",
+                "{{userId}}",
+                "role"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"VIP\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Create Contest",
+          "description": "Admin only. Create a contest.",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/contest",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "contest"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Sample Contest\",\n  \"description\": \"A demo contest\",\n  \"access\": \"NORMAL\",\n  \"startsAt\": \"2026-06-30T10:00:00.000Z\",\n  \"endsAt\": \"2026-06-30T12:00:00.000Z\",\n  \"prizeTitle\": \"Gift Card\",\n  \"prizeDesc\": \"Winner prize description\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Contest",
+          "description": "Admin only. Update contest fields.",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/contest/{{contestId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "contest",
+                "{{contestId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACTIVE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Contest",
+          "description": "Admin only. Delete a contest.",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/contest/{{contestId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "contest",
+                "{{contestId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Question",
+          "description": "Admin only. Add a question to a contest.",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/contest/{{contestId}}/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "contest",
+                "{{contestId}}",
+                "questions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Which option is correct?\",\n  \"type\": \"SINGLE_SELECT\",\n  \"order\": 1,\n  \"points\": 5,\n  \"options\": [\n    { \"text\": \"Option A\", \"isCorrect\": true, \"order\": 1 },\n    { \"text\": \"Option B\", \"isCorrect\": false, \"order\": 2 }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Question",
+          "description": "Admin only. Update question text, points, order, or options.",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/contest/{{contestId}}/questions/{{questionId1}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "contest",
+                "{{contestId}}",
+                "questions",
+                "{{questionId1}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Updated question text\",\n  \"points\": 10\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Question",
+          "description": "Admin only. Delete a question from a contest.",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/contest/{{contestId}}/questions/{{questionId1}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "contest",
+                "{{contestId}}",
+                "questions",
+                "{{questionId1}}"
               ]
             }
           }
@@ -319,6 +539,10 @@
     },
     {
       "key": "optionId1",
+      "value": ""
+    },
+    {
+      "key": "userId",
       "value": ""
     }
   ]

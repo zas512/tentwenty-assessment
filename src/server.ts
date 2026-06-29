@@ -10,7 +10,7 @@ import { rateLimit } from "./middlewares/rateLimit";
 import { connectDB } from "./config/prisma";
 import routes from "./routes/index";
 
-config({ override: true });
+config({ override: true, quiet: true });
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 5000);
